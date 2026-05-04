@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Noticias — CUN Portal{% endblock %}
+{% block extra_style %}<style>
+.noticias-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem}
+.noticia-card{background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:1.5rem;display:flex;flex-direction:column;gap:0.75rem}
+.noticia-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.noticia-titulo{font-size:1rem;font-weight:600;color:#1e293b;line-height:1.4}
+.noticia-desc{font-size:0.88rem;color:#475569;line-height:1.6;flex:1}
+.noticia-fecha{font-size:0.78rem;color:#94a3b8}
+</style>{% endblock %}
+{% block content %}
+<div class="page-title">Noticias y Avisos</div>
+<div class="page-sub">Mantente al día con la vida universitaria</div>
+<div class="noticias-grid">
+{% for n in noticias %}
+<div class="noticia-card">
+  <div class="noticia-header">
+    <span class="badge badge-azul">{{ n.categoria }}</span>
+    <span class="noticia-fecha">{{ n.fecha }}</span>
+  </div>
+  <div class="noticia-titulo">{{ n.titulo }}</div>
+  <div class="noticia-desc">{{ n.descripcion }}</div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

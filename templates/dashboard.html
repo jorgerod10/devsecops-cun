@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — CUN Portal{% endblock %}
+{% block extra_style %}<style>
+.grid-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.stat-card{background:#fff;border-radius:14px;padding:1.25rem 1.5rem;border:1px solid #e2e8f0;display:flex;flex-direction:column;gap:0.35rem}
+.stat-num{font-size:2rem;font-weight:700;font-family:'Fraunces',serif;color:#1a3a6b}
+.stat-label{font-size:0.82rem;color:#64748b;font-weight:500}
+.stat-card.verde .stat-num{color:#059669}
+.stat-card.amarillo .stat-num{color:#d97706}
+.grid-main{display:grid;grid-template-columns:1fr 340px;gap:1.5rem}
+.section-title{font-size:1rem;font-weight:600;color:#1a3a6b;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
+.nota-row{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 0;border-bottom:1px solid #f1f5f9}
+.nota-row:last-child{border-bottom:none}
+.nota-materia{font-size:0.9rem;font-weight:500}
+.nota-chips{display:flex;gap:0.5rem}
+.chip{padding:0.2rem 0.6rem;border-radius:6px;font-size:0.78rem;font-weight:600;background:#f1f5f9;color:#475569}
+.chip.alta{background:#d1fae5;color:#065f46}
+.chip.media{background:#fef3c7;color:#92400e}
+.chip.baja{background:#fee2e2;color:#991b1b}
+.chip.null{background:#f8fafc;color:#94a3b8}
+.horario-item{display:flex;gap:1rem;padding:0.75rem 0;border-bottom:1px solid #f1f5f9;align-items:flex-start}
+.horario-item:last-child{border-bottom:none}
+.horario-dia{width:70px;flex-shrink:0}
+.horario-dia .dia{font-size:0.78rem;font-weight:700;color:#1a3a6b;text-transform:uppercase}
+.horario-dia .hora{font-size:0.75rem;color:#64748b}
+.horario-info .materia{font-size:0.88rem;font-weight:600}
+.horario-info .salon{font-size:0.78rem;color:#64748b}
+.noticia-item{padding:0.9rem 0;border-bottom:1px solid #f1f5f9}
+.noticia-item:last-child{border-bottom:none}
+.noticia-titulo{font-size:0.9rem;font-weight:600;margin-bottom:0.25rem}
+.noticia-desc{font-size:0.8rem;color:#64748b;line-height:1.5}
+.welcome-bar{background:linear-gradient(135deg,#1a3a6b,#2563eb);border-radius:16px;padding:1.5rem 2rem;color:#fff;margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center}
+.welcome-bar h1{font-family:'Fraunces',serif;font-size:1.6rem;margin-bottom:0.25rem}
+.welcome-bar p{opacity:0.75;font-size:0.88rem}
+.promedio-big{font-family:'Fraunces',serif;font-size:2.5rem;font-weight:700;color:#93c5fd}
+.promedio-label{font-size:0.78rem;opacity:0.7;margin-top:0.1rem}
+</style>{% endblock %}
+{% block content %}
+<div class="welcome-bar">
+  <div>
+    <h1>Hola, {{ info.nombre.split()[0] }} 👋</h1>
+    <p>{{ fecha_hoy }} · {{ info.carrera }} · Semestre {{ info.semestre }}</p>
+  </div>
+  <div style="text-align:right">
+    <div class="promedio-big">{{ promedio_general }}</div>
+    <div class="promedio-label">Promedio general</div>
+  </div>
+</div>
+
+<div class="grid-stats">
+  <div class="stat-card">
+    <div class="stat-num">{{ info.materias|length }}</div>
+    <div class="stat-label">Materias inscritas</div>
+  </div>
+  <div class="stat-card verde">
+    <div class="stat-num">{{ info.semestre }}</div>
+    <div class="stat-label">Semestre actual</div>
+  </div>
+  <div class="stat-card amarillo">
+    <div class="stat-num">{{ promedio_general }}</div>
+    <div class="stat-label">Promedio acumulado</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">2026-1</div>
+    <div class="stat-label">Período académico</div>
+  </div>
+</div>
+
+<div class="grid-main">
+  <div>
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="section-title">📘 Mis calificaciones</div>
+      {% for n in notas %}
+      {% set prom = calcular_promedio(n) %}
+      <div class="nota-row">
+        <span class="nota-materia">{{ n.materia }}</span>
+        <div class="nota-chips">
+          {% if n.corte1 %}<span class="chip {% if n.corte1 >= 4 %}alta{% elif n.corte1 >= 3 %}media{% else %}baja{% endif %}">C1: {{ n.corte1 }}</span>{% else %}<span class="chip null">C1: —</span>{% endif %}
+          {% if n.corte2 %}<span class="chip {% if n.corte2 >= 4 %}alta{% elif n.corte2 >= 3 %}media{% else %}baja{% endif %}">C2: {{ n.corte2 }}</span>{% else %}<span class="chip null">C2: —</span>{% endif %}
+          {% if prom %}<span class="chip {% if prom >= 4 %}alta{% elif prom >= 3 %}media{% else %}baja{% endif %}">≈ {{ prom }}</span>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="card">
+      <div class="section-title">🗓 Próximas clases</div>
+      {% for h in horarios %}
+      <div class="horario-item">
+        <div class="horario-dia">
+          <div class="dia">{{ h.dia }}</div>
+          <div class="hora">{{ h.hora }}</div>
+        </div>
+        <div class="horario-info">
+          <div class="materia">{{ h.materia }}</div>
+          <div class="salon">Salón {{ h.salon }} · {{ h.profesor }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="section-title">📢 Noticias recientes</div>
+      {% for n in noticias %}
+      <div class="noticia-item">
+        <span class="badge badge-azul" style="margin-bottom:0.4rem;display:inline-block">{{ n.categoria }}</span>
+        <div class="noticia-titulo">{{ n.titulo }}</div>
+        <div class="noticia-desc">{{ n.descripcion[:100] }}...</div>
+      </div>
+      {% endfor %}
+      <a href="/noticias" style="display:block;text-align:center;margin-top:1rem;color:#2563eb;font-size:0.85rem;text-decoration:none;font-weight:500">Ver todas las noticias →</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

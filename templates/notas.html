@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Mis Notas — CUN Portal{% endblock %}
+{% block extra_style %}<style>
+.notas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem}
+.nota-card{background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:1.5rem;position:relative;overflow:hidden}
+.nota-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:#1a3a6b}
+.nota-card.aprobado::before{background:#059669}
+.nota-card.riesgo::before{background:#d97706}
+.nota-card.reprobado::before{background:#dc2626}
+.nota-nombre{font-size:1rem;font-weight:600;margin-bottom:1.25rem;color:#1e293b}
+.cortes{display:flex;gap:0.75rem;margin-bottom:1.25rem}
+.corte-box{flex:1;background:#f8fafc;border-radius:10px;padding:0.75rem;text-align:center;border:1px solid #e2e8f0}
+.corte-label{font-size:0.72rem;color:#64748b;font-weight:600;margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.5px}
+.corte-val{font-size:1.4rem;font-weight:700;font-family:'Fraunces',serif}
+.corte-val.alta{color:#059669}
+.corte-val.media{color:#d97706}
+.corte-val.baja{color:#dc2626}
+.corte-val.null{color:#cbd5e1;font-size:1rem;padding-top:0.3rem}
+.prom-row{display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid #f1f5f9}
+.prom-label{font-size:0.82rem;color:#64748b}
+.prom-val{font-size:1.1rem;font-weight:700;font-family:'Fraunces',serif}
+.estado-badge{display:inline-block;padding:0.25rem 0.75rem;border-radius:99px;font-size:0.75rem;font-weight:700}
+.estado-aprobado{background:#d1fae5;color:#065f46}
+.estado-riesgo{background:#fef3c7;color:#92400e}
+.estado-reprobado{background:#fee2e2;color:#991b1b}
+.estado-pendiente{background:#f1f5f9;color:#64748b}
+</style>{% endblock %}
+{% block content %}
+<div class="page-title">Mis Calificaciones</div>
+<div class="page-sub">Período 2026-1 · Consulta tus notas por corte</div>
+<div class="notas-grid">
+{% for nota, prom in notas_data %}
+{% if prom %}
+  {% if prom >= 3.0 %}{% set estado = 'aprobado' %}{% elif prom >= 2.5 %}{% set estado = 'riesgo' %}{% else %}{% set estado = 'reprobado' %}{% endif %}
+{% else %}
+  {% set estado = '' %}
+{% endif %}
+<div class="nota-card {{ estado }}">
+  <div class="nota-nombre">{{ nota.materia }}</div>
+  <div class="cortes">
+    <div class="corte-box">
+      <div class="corte-label">Corte 1</div>
+      {% if nota.corte1 %}
+        <div class="corte-val {% if nota.corte1 >= 4 %}alta{% elif nota.corte1 >= 3 %}media{% else %}baja{% endif %}">{{ nota.corte1 }}</div>
+      {% else %}
+        <div class="corte-val null">—</div>
+      {% endif %}
+    </div>
+    <div class="corte-box">
+      <div class="corte-label">Corte 2</div>
+      {% if nota.corte2 %}
+        <div class="corte-val {% if nota.corte2 >= 4 %}alta{% elif nota.corte2 >= 3 %}media{% else %}baja{% endif %}">{{ nota.corte2 }}</div>
+      {% else %}
+        <div class="corte-val null">—</div>
+      {% endif %}
+    </div>
+    <div class="corte-box">
+      <div class="corte-label">Corte 3</div>
+      {% if nota.corte3 %}
+        <div class="corte-val {% if nota.corte3 >= 4 %}alta{% elif nota.corte3 >= 3 %}media{% else %}baja{% endif %}">{{ nota.corte3 }}</div>
+      {% else %}
+        <div class="corte-val null">—</div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="prom-row">
+    <div>
+      <div class="prom-label">Promedio parcial</div>
+      <div class="prom-val" style="color:{% if prom and prom >= 4 %}#059669{% elif prom and prom >= 3 %}#d97706{% elif prom %}#dc2626{% else %}#94a3b8{% endif %}">
+        {{ prom if prom else '—' }}
+      </div>
+    </div>
+    {% if prom %}
+      <span class="estado-badge estado-{{ estado }}">
+        {% if estado == 'aprobado' %}Aprobando{% elif estado == 'riesgo' %}En riesgo{% elif estado == 'reprobado' %}Reprobando{% endif %}
+      </span>
+    {% else %}
+      <span class="estado-badge estado-pendiente">Pendiente</span>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}
