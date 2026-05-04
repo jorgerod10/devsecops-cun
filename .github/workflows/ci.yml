@@ -40,16 +40,16 @@ jobs:
       - name: Ejecutar análisis SAST
         run: semgrep --config p/python app.py || true
 
-      - name: Guardar reporte de seguridad
+      - name: Guardar reporte SAST
         if: always()
-        run: semgrep --config p/python app.py --json > reporte_seguridad.json || true
+        run: semgrep --config p/python app.py --json > reporte_sast.json || true
 
-      - name: Subir reporte como artefacto
+      - name: Subir reporte SAST
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reporte-seguridad
-          path: reporte_seguridad.json
+          name: reporte-sast
+          path: reporte_sast.json
 
   dependencias:
     name: Verificar Dependencias Seguras
@@ -71,3 +71,51 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip-audit || true
+
+  dast-zap:
+    name: Análisis DAST con OWASP ZAP
+    runs-on: ubuntu-latest
+    needs: pruebas
+    steps:
+      - name: Descargar código del repo
+        uses: actions/checkout@v4
+
+      - name: Instalar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar Flask
+        run: pip install flask
+
+      - name: Iniciar aplicación Flask en segundo plano
+        run: |
+          python app.py &
+          sleep 5
+          echo "App corriendo en http://localhost:5000"
+
+      - name: Correr OWASP ZAP baseline scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://localhost:5000'
+          fail_action: false
+          artifact_name: reporte-dast-zap
+
+  docker-seguridad:
+    name: Seguridad del Contenedor Docker
+    runs-on: ubuntu-latest
+    needs: pruebas
+    steps:
+      - name: Descargar código del repo
+        uses: actions/checkout@v4
+
+      - name: Construir imagen Docker
+        run: docker build -t devsecops-cun:latest .
+
+      - name: Escanear imagen con Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'devsecops-cun:latest'
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
