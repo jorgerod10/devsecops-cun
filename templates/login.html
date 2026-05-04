@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CUN — Iniciar Sesión</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:wght@700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--azul:#1a3a6b;--azul-claro:#2563eb;--fondo:#f0f4f8;--borde:#e2e8f0}
+body{font-family:'DM Sans',sans-serif;background:var(--fondo);min-height:100vh;display:flex}
+.left{width:45%;background:var(--azul);display:flex;flex-direction:column;justify-content:center;padding:4rem;position:relative;overflow:hidden}
+.left::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,0.05)}
+.left::after{content:'';position:absolute;bottom:-60px;left:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,0.04)}
+.brand{font-family:'Fraunces',serif;font-size:2.2rem;color:#fff;margin-bottom:0.5rem}
+.brand span{color:#93c5fd}
+.tagline{color:rgba(255,255,255,0.65);font-size:1rem;line-height:1.6;margin-bottom:3rem}
+.feature{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.5rem}
+.feature-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem}
+.feature-text h4{color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.2rem}
+.feature-text p{color:rgba(255,255,255,0.55);font-size:0.82rem;line-height:1.5}
+.right{flex:1;display:flex;align-items:center;justify-content:center;padding:3rem}
+.login-box{width:100%;max-width:400px}
+.login-box h2{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--azul);margin-bottom:0.35rem}
+.login-box p{color:#64748b;font-size:0.9rem;margin-bottom:2rem}
+.form-group{margin-bottom:1.25rem}
+label{display:block;font-size:0.85rem;font-weight:600;color:#374151;margin-bottom:0.5rem}
+input{width:100%;padding:0.75rem 1rem;border:1.5px solid var(--borde);border-radius:10px;font-size:0.9rem;font-family:'DM Sans',sans-serif;background:#fff;transition:border-color 0.2s,box-shadow 0.2s;outline:none}
+input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.btn-login{width:100%;padding:0.85rem;background:var(--azul);color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background 0.2s,transform 0.1s;margin-top:0.5rem}
+.btn-login:hover{background:#1e4a8a}
+.btn-login:active{transform:scale(0.99)}
+.hint{background:#f8fafc;border:1px solid var(--borde);border-radius:10px;padding:1rem;margin-top:1.5rem;font-size:0.82rem;color:#64748b}
+.hint strong{color:#374151}
+.flash{padding:0.85rem 1rem;border-radius:10px;margin-bottom:1rem;font-size:0.88rem;font-weight:500;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+</style>
+</head>
+<body>
+<div class="left">
+  <div class="brand">CUN <span>Portal</span></div>
+  <p class="tagline">Plataforma académica de la Corporación Unificada Nacional de Educación Superior</p>
+  <div class="feature">
+    <div class="feature-icon">📊</div>
+    <div class="feature-text">
+      <h4>Consulta tus notas</h4>
+      <p>Accede a tus calificaciones por corte en tiempo real</p>
+    </div>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">🗓</div>
+    <div class="feature-text">
+      <h4>Tu horario académico</h4>
+      <p>Visualiza tus clases, salones y docentes asignados</p>
+    </div>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">🔒</div>
+    <div class="feature-text">
+      <h4>Seguridad DevSecOps</h4>
+      <p>Plataforma con prácticas de seguridad integradas desde el código</p>
+    </div>
+  </div>
+</div>
+<div class="right">
+  <div class="login-box">
+    <h2>Bienvenido</h2>
+    <p>Ingresa con tu correo institucional CUN</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label>Correo institucional</label>
+        <input type="email" name="email" placeholder="usuario@cun.edu.co" required>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" name="password" placeholder="••••••••" required>
+      </div>
+      <button class="btn-login" type="submit">Iniciar sesión</button>
+    </form>
+    <div class="hint">
+      <strong>Credenciales de prueba:</strong><br>
+      📧 estudiante@cun.edu.co<br>
+      🔑 123456
+    </div>
+  </div>
+</div>
+</body>
+</html>
