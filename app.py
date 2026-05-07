@@ -193,11 +193,11 @@ def admin_editar_nota():
             if n['materia'] == materia:
                 try:
                     val = float(valor)
-                    if 0.0 <= val <= 5.0:
+                    if 1.0 <= val <= 5.0:
                         n[corte] = val
                         flash(f'Nota actualizada: {materia} — {corte} = {val}', 'success')
                     else:
-                        flash('La nota debe estar entre 0.0 y 5.0', 'error')
+                        flash('La nota debe estar entre 1.0 y 5.0', 'error')
                 except:
                     n[corte] = None
                     flash(f'Nota eliminada: {materia} — {corte}', 'success')
